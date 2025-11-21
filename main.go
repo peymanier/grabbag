@@ -32,6 +32,10 @@ func main() {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Heartbeat("/ping"))
 
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("hello"))
+	})
+
 	err = http.ListenAndServe(":3333", r)
 	if err != nil {
 		log.Fatal(err)
