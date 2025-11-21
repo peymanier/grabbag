@@ -62,3 +62,35 @@ func (q *Queries) CreateAssetPriceLog(ctx context.Context, arg CreateAssetPriceL
 	)
 	return i, err
 }
+
+const listAssets = `-- name: ListAssets :many
+select id, code, name, price, created_at
+from
+    assets
+`
+
+func (q *Queries) ListAssets(ctx context.Context) ([]Asset, error) {
+	rows, err := q.db.Query(ctx, listAssets)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Asset
+	for rows.Next() {
+		var i Asset
+		if err := rows.Scan(
+			&i.ID,
+			&i.Code,
+			&i.Name,
+			&i.Price,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

@@ -11,3 +11,8 @@ insert into
 values
     ($1, $2)
 returning *;
+
+-- name: ListAssets :many
+select *
+from
+    assets;
