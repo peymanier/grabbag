@@ -10,7 +10,28 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5"
 	"github.com/joho/godotenv"
+	"github.com/peymanier/grabbag/database"
 )
+
+type Server struct {
+	Router  *chi.Mux
+	Queries *database.Queries
+}
+
+func NewServer(conn database.DBTX) *Server {
+	s := &Server{}
+	s.Router = chi.NewRouter()
+	s.Queries = database.New(conn)
+	return s
+}
+
+func (s *Server) MountHandlers() {
+	s.Router.Use(middleware.Logger)
+	s.Router.Use(middleware.Recoverer)
+	s.Router.Use(middleware.Heartbeat("/ping"))
+
+	s.Router.Get("/assets", s.ListAssets)
+}
 
 func main() {
 	err := godotenv.Load()
@@ -25,18 +46,10 @@ func main() {
 	}
 	defer conn.Close(ctx)
 
-	//queries := database.New(conn)
+	s := NewServer(conn)
+	s.MountHandlers()
 
-	r := chi.NewRouter()
-	r.Use(middleware.Logger)
-	r.Use(middleware.Recoverer)
-	r.Use(middleware.Heartbeat("/ping"))
-
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("hello"))
-	})
-
-	err = http.ListenAndServe(":3333", r)
+	err = http.ListenAndServe(":3333", s.Router)
 	if err != nil {
 		log.Fatal(err)
 	}
