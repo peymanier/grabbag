@@ -1,14 +1,18 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"text/template"
+
+	"github.com/peymanier/grabbag/messages"
 )
 
 func (s *Server) ListAssets(w http.ResponseWriter, r *http.Request) {
 	assets, err := s.Queries.ListAssets(r.Context())
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Println(err.Error())
+		http.Error(w, messages.ErrUnknown.String(), http.StatusInternalServerError)
 		return
 	}
 
@@ -19,6 +23,7 @@ func (s *Server) ListAssets(w http.ResponseWriter, r *http.Request) {
 
 	err = tmpl.Execute(w, AssetsToDTO(assets))
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Println(err.Error())
+		http.Error(w, messages.ErrUnknown.String(), http.StatusInternalServerError)
 	}
 }
