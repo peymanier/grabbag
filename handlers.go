@@ -12,7 +12,7 @@ func (s *Server) ListAssets(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles("templates/assets.gohtml"))
+	tmpl := template.Must(template.ParseFiles("templates/layout.gohtml", "templates/assets.gohtml"))
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
