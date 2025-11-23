@@ -17,7 +17,7 @@ func (s *Server) ListAssets(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 
-	err = tmpl.Execute(w, assets)
+	err = tmpl.Execute(w, AssetsToDTO(assets))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
