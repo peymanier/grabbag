@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -96,7 +97,26 @@ func main() {
 	s := NewServer(conn)
 	s.MountHandlers()
 
+	ctx, cancel := context.WithCancel(context.Background())
+	ticker := time.NewTicker(10 * time.Second)
+
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				fmt.Println("ticking")
+			case <-ctx.Done():
+				fmt.Println("stopping ticker")
+				return
+			}
+		}
+	}()
+
 	err = http.ListenAndServe(":3333", s.Router)
+
+	cancel()
+	ticker.Stop()
+
 	if err != nil {
 		log.Fatal(err)
 	}
