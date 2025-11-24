@@ -11,33 +11,6 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const createAsset = `-- name: CreateAsset :one
-insert into
-    assets (code, name, price)
-values
-    ($1, $2, $3)
-returning id, code, name, price, created_at
-`
-
-type CreateAssetParams struct {
-	Code  string
-	Name  string
-	Price pgtype.Numeric
-}
-
-func (q *Queries) CreateAsset(ctx context.Context, arg CreateAssetParams) (Asset, error) {
-	row := q.db.QueryRow(ctx, createAsset, arg.Code, arg.Name, arg.Price)
-	var i Asset
-	err := row.Scan(
-		&i.ID,
-		&i.Code,
-		&i.Name,
-		&i.Price,
-		&i.CreatedAt,
-	)
-	return i, err
-}
-
 const createAssetPriceLog = `-- name: CreateAssetPriceLog :one
 insert into
     asset_price_logs (asset_id, price)
@@ -63,8 +36,37 @@ func (q *Queries) CreateAssetPriceLog(ctx context.Context, arg CreateAssetPriceL
 	return i, err
 }
 
+const createOrUpdateAsset = `-- name: CreateOrUpdateAsset :one
+insert into
+    assets (code, price, updated_at)
+values
+    ($1, $2, $3)
+on conflict (code) do update set
+    price = excluded.price
+returning id, code, price, created_at, updated_at
+`
+
+type CreateOrUpdateAssetParams struct {
+	Code      string
+	Price     pgtype.Numeric
+	UpdatedAt pgtype.Timestamptz
+}
+
+func (q *Queries) CreateOrUpdateAsset(ctx context.Context, arg CreateOrUpdateAssetParams) (Asset, error) {
+	row := q.db.QueryRow(ctx, createOrUpdateAsset, arg.Code, arg.Price, arg.UpdatedAt)
+	var i Asset
+	err := row.Scan(
+		&i.ID,
+		&i.Code,
+		&i.Price,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const listAssets = `-- name: ListAssets :many
-select id, code, name, price, created_at
+select id, code, price, created_at, updated_at
 from
     assets
 `
@@ -81,9 +83,9 @@ func (q *Queries) ListAssets(ctx context.Context) ([]Asset, error) {
 		if err := rows.Scan(
 			&i.ID,
 			&i.Code,
-			&i.Name,
 			&i.Price,
 			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
