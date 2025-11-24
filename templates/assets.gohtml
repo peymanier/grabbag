@@ -5,11 +5,9 @@
 
     {{ range . }}
         <div class="asset">
-            <p><strong>ID:</strong> {{ .ID }}</p>
             <p><strong>Code:</strong> {{ .Code }}</p>
-            <p><strong>Name:</strong> {{ .Name }}</p>
             <p><strong>Price:</strong> {{ .Price }}</p>
-            <p><strong>Created At:</strong> {{ .CreatedAt }}</p>
+            <p><strong>Updated At:</strong> {{ timeago .UpdatedAt }}</p>
         </div>
         <hr>
     {{ else }}

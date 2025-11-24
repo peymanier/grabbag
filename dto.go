@@ -12,6 +12,7 @@ type AssetDTO struct {
 	Code      string
 	Price     string
 	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 func AssetToDTO(asset database.Asset) AssetDTO {
@@ -20,6 +21,7 @@ func AssetToDTO(asset database.Asset) AssetDTO {
 		Code:      asset.Code,
 		Price:     *pgconv.NumericToString(asset.Price),
 		CreatedAt: *pgconv.TimestamptzToTime(asset.CreatedAt),
+		UpdatedAt: *pgconv.TimestamptzToTime(asset.UpdatedAt),
 	}
 }
 
