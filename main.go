@@ -14,6 +14,7 @@ import (
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/joho/godotenv"
 	"github.com/peymanier/grabbag/database"
+	"github.com/peymanier/grabbag/providers"
 	"github.com/pressly/goose/v3"
 )
 
@@ -104,9 +105,9 @@ func main() {
 		for {
 			select {
 			case <-ticker.C:
-				fmt.Println("ticking")
+				providers.NobitexUpdate(ctx, s.Queries)
 			case <-ctx.Done():
-				fmt.Println("stopping ticker")
+				log.Println("stopping ticker")
 				return
 			}
 		}

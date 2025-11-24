@@ -11,9 +11,9 @@ import (
 type Asset struct {
 	ID        int64
 	Code      string
-	Name      string
 	Price     pgtype.Numeric
 	CreatedAt pgtype.Timestamptz
+	UpdatedAt pgtype.Timestamptz
 }
 
 type AssetPriceLog struct {
