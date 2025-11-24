@@ -42,7 +42,8 @@ insert into
 values
     ($1, $2, $3)
 on conflict (code) do update set
-    price = excluded.price
+                                 price      = excluded.price,
+                                 updated_at = excluded.updated_at
 returning id, code, price, created_at, updated_at
 `
 

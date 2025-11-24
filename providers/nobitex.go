@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"strconv"
 	"time"
 
 	"github.com/peymanier/grabbag/database"
@@ -48,11 +47,7 @@ func NobitexUpdateAsset(ctx context.Context, queries *database.Queries, code str
 		return err
 	}
 
-	priceInt, err := strconv.Atoi(response.Trades[0].Price)
-	if err != nil {
-		return err
-	}
-	price := pgconv.IntToNumeric(priceInt)
+	price := pgconv.StringToNumeric(response.Trades[0].Price)
 
 	asset, err := queries.CreateOrUpdateAsset(context.Background(), database.CreateOrUpdateAssetParams{
 		Code:      code,

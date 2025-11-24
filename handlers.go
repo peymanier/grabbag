@@ -17,14 +17,14 @@ func (s *Server) ListAssets(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.New("assets").Funcs(template.FuncMap{
+	tmpl := template.Must(template.New("").Funcs(template.FuncMap{
 		"timeago": templ.TimeAgo,
 	}).ParseFiles("templates/layout.gohtml", "templates/assets.gohtml"))
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 
-	err = tmpl.Execute(w, AssetsToDTO(assets))
+	err = tmpl.ExecuteTemplate(w, "layout.gohtml", AssetsToDTO(assets))
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, messages.ErrUnknown.String(), http.StatusInternalServerError)

@@ -1,7 +1,7 @@
 package pgconv
 
 import (
-	"math/big"
+	"log"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
@@ -42,10 +42,14 @@ func TimeToTimestamptz(t time.Time) pgtype.Timestamptz {
 	}
 }
 
-func IntToNumeric(i int) pgtype.Numeric {
-	bigint := big.NewInt(int64(i))
+func StringToNumeric(s string) pgtype.Numeric {
+	var numeric pgtype.Numeric
 
-	return pgtype.Numeric{Int: bigint, Valid: true}
+	if err := numeric.Scan(s); err != nil {
+		log.Panic(err)
+	}
+
+	return numeric
 }
 
 func Int64ToInt8(i int64) pgtype.Int8 {

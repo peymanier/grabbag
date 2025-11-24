@@ -3,8 +3,10 @@ insert into
     assets (code, price, updated_at)
 values
     ($1, $2, $3)
-on conflict (code) do update set
-    price = excluded.price
+on conflict (code)
+    do update set
+                  price      = excluded.price,
+                  updated_at = excluded.updated_at
 returning *;
 
 -- name: CreateAssetPriceLog :one
