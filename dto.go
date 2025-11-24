@@ -4,12 +4,12 @@ import (
 	"time"
 
 	"github.com/peymanier/grabbag/database"
+	"github.com/peymanier/grabbag/pgconv"
 )
 
 type AssetDTO struct {
 	ID        int64
 	Code      string
-	Name      string
 	Price     string
 	CreatedAt time.Time
 }
@@ -18,9 +18,8 @@ func AssetToDTO(asset database.Asset) AssetDTO {
 	return AssetDTO{
 		ID:        asset.ID,
 		Code:      asset.Code,
-		Name:      asset.Name,
-		Price:     *NumericToString(asset.Price),
-		CreatedAt: *TimestamptzToTime(asset.CreatedAt),
+		Price:     *pgconv.NumericToString(asset.Price),
+		CreatedAt: *pgconv.TimestamptzToTime(asset.CreatedAt),
 	}
 }
 
