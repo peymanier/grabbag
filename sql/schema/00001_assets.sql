@@ -1,12 +1,16 @@
 -- +goose Up
+-- +goose StatementBegin
 create table assets
 (
     id         bigint generated always as identity primary key,
     code       varchar(5)     not null unique,
     name       varchar(50)    not null,
     price      numeric(15, 6) not null,
-    created_at timestamptz    not null default now()
+    created_at timestamptz    not null default now(),
+    updated_at timestamptz    not null
 );
+
+create index assets_created_at_idx on assets (created_at);
 
 create table asset_price_logs
 (
@@ -16,9 +20,14 @@ create table asset_price_logs
     created_at timestamptz    not null default now()
 );
 
-create index asset_values_from_asset_idx on asset_price_logs (asset_id);
+create index asset_price_logs_created_at_idx on asset_price_logs (created_at);
+create index asset_price_logs_asset_id_idx on asset_price_logs (asset_id);
+-- +goose StatementEnd
+
 
 -- +goose Down
-drop table assets;
-
+-- +goose StatementBegin
 drop table asset_price_logs;
+
+drop table assets;
+-- +goose StatementEnd
