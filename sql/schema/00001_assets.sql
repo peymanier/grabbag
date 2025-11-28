@@ -4,7 +4,7 @@ create table assets
 (
     id         bigint generated always as identity primary key,
     code       varchar(20)    not null unique,
-    price      numeric(15, 6) not null,
+    price      numeric(24, 6) not null,
     created_at timestamptz    not null default now(),
     updated_at timestamptz    not null
 );
@@ -15,7 +15,7 @@ create table asset_price_logs
 (
     id         bigint generated always as identity primary key,
     asset_id   bigint references assets (id),
-    price      numeric(15, 6) not null,
+    price      numeric(24, 6) not null,
     created_at timestamptz    not null default now()
 );
 

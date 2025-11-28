@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -69,7 +70,7 @@ func TGJUUpdateCoins(ctx context.Context, queries *database.Queries) error {
 			UpdatedAt: pgconv.TimeToTimestamptz(time.Now().UTC()),
 		})
 		if err != nil {
-			log.Println(err)
+			log.Println(err, code, price, coin.Price)
 			continue
 		}
 
@@ -78,7 +79,7 @@ func TGJUUpdateCoins(ctx context.Context, queries *database.Queries) error {
 			Price:   price,
 		})
 		if err != nil {
-			log.Println(err)
+			log.Println(err, code, price)
 		}
 	}
 
@@ -105,7 +106,12 @@ func GetCoinCode(coin TGJUCoin) string {
 
 func GetCoinPrice(coin TGJUCoin) pgtype.Numeric {
 	priceStr := strings.ReplaceAll(coin.Price, ",", "")
-	price := pgconv.StringToNumeric(priceStr)
+
+	priceInt64, err := strconv.ParseInt(priceStr, 10, 64)
+	if err != nil {
+		log.Println(err)
+	}
+	price := pgconv.Int64ToNumeric(priceInt64)
 
 	return price
 }

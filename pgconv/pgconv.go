@@ -2,6 +2,7 @@ package pgconv
 
 import (
 	"log"
+	"math/big"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
@@ -50,6 +51,16 @@ func StringToNumeric(s string) pgtype.Numeric {
 	}
 
 	return numeric
+}
+
+func Int64ToNumeric(i int64) pgtype.Numeric {
+	return pgtype.Numeric{
+		Int:              big.NewInt(i),
+		Exp:              0,
+		NaN:              false,
+		InfinityModifier: 0,
+		Valid:            true,
+	}
 }
 
 func Int64ToInt8(i int64) pgtype.Int8 {
