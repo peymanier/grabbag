@@ -41,9 +41,10 @@ insert into
     assets (code, price, updated_at)
 values
     ($1, $2, $3)
-on conflict (code) do update set
-                                 price      = excluded.price,
-                                 updated_at = excluded.updated_at
+on conflict (code)
+    do update set
+                  price      = excluded.price,
+                  updated_at = excluded.updated_at
 returning id, code, price, created_at, updated_at
 `
 
@@ -55,6 +56,27 @@ type CreateOrUpdateAssetParams struct {
 
 func (q *Queries) CreateOrUpdateAsset(ctx context.Context, arg CreateOrUpdateAssetParams) (Asset, error) {
 	row := q.db.QueryRow(ctx, createOrUpdateAsset, arg.Code, arg.Price, arg.UpdatedAt)
+	var i Asset
+	err := row.Scan(
+		&i.ID,
+		&i.Code,
+		&i.Price,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getAsset = `-- name: GetAsset :one
+select id, code, price, created_at, updated_at
+from
+    assets
+where
+    code = $1
+`
+
+func (q *Queries) GetAsset(ctx context.Context, code string) (Asset, error) {
+	row := q.db.QueryRow(ctx, getAsset, code)
 	var i Asset
 	err := row.Scan(
 		&i.ID,

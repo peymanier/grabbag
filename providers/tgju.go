@@ -60,26 +60,38 @@ func TGJUUpdateCoins(ctx context.Context, queries *database.Queries) error {
 		})
 	})
 
+	var USDTIRTPrice pgtype.Numeric
+	USDTIRTAsset, err := queries.GetAsset(ctx, "USDT/IRT")
+	if err != nil {
+		log.Println(err)
+	} else {
+		USDTIRTPrice = USDTIRTAsset.Price
+	}
+
 	for _, coin := range response.Coins {
 		code := GetCoinCode(coin)
 		price := GetCoinPrice(coin)
 
-		asset, err := queries.CreateOrUpdateAsset(context.Background(), database.CreateOrUpdateAssetParams{
+		asset, err := queries.CreateOrUpdateAsset(ctx, database.CreateOrUpdateAssetParams{
 			Code:      code,
 			Price:     price,
 			UpdatedAt: pgconv.TimeToTimestamptz(time.Now().UTC()),
 		})
 		if err != nil {
-			log.Println(err, code, price, coin.Price)
+			log.Println(err)
 			continue
 		}
 
-		_, err = queries.CreateAssetPriceLog(context.Background(), database.CreateAssetPriceLogParams{
+		_, err = queries.CreateAssetPriceLog(ctx, database.CreateAssetPriceLogParams{
 			AssetID: pgconv.Int64ToInt8(asset.ID),
 			Price:   price,
 		})
 		if err != nil {
-			log.Println(err, code, price)
+			log.Println(err)
+		}
+
+		if USDTIRTPrice.Valid {
+			CreateConvertedUSDTQuoteAsset(ctx, queries, asset, USDTIRTPrice)
 		}
 	}
 
@@ -111,7 +123,34 @@ func GetCoinPrice(coin TGJUCoin) pgtype.Numeric {
 	if err != nil {
 		log.Println(err)
 	}
-	price := pgconv.Int64ToNumeric(priceInt64)
 
+	price := pgconv.Int64ToNumeric(priceInt64 / 10)
 	return price
+}
+
+func CreateConvertedUSDTQuoteAsset(ctx context.Context, queries *database.Queries, asset database.Asset, USDTIRTPrice pgtype.Numeric) database.Asset {
+	baseAsset := strings.Split(asset.Code, "/")[0]
+	code := fmt.Sprintf("%s/USDT", baseAsset)
+
+	priceFloat64 := pgconv.NumericToFloat64(asset.Price) / pgconv.NumericToFloat64(USDTIRTPrice)
+	price := pgconv.Float64ToNumeric(priceFloat64)
+
+	asset, err := queries.CreateOrUpdateAsset(ctx, database.CreateOrUpdateAssetParams{
+		Code:      code,
+		Price:     price,
+		UpdatedAt: pgconv.TimeToTimestamptz(time.Now().UTC()),
+	})
+	if err != nil {
+		log.Println(err)
+	}
+
+	_, err = queries.CreateAssetPriceLog(ctx, database.CreateAssetPriceLogParams{
+		AssetID: pgconv.Int64ToInt8(asset.ID),
+		Price:   price,
+	})
+	if err != nil {
+		log.Println(err)
+	}
+
+	return asset
 }

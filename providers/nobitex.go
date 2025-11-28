@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 
@@ -53,7 +54,11 @@ func NobitexUpdateAsset(ctx context.Context, queries *database.Queries, code str
 		return err
 	}
 
-	price := pgconv.StringToNumeric(response.Trades[0].Price)
+	priceInt64, err := strconv.ParseInt(response.Trades[0].Price, 10, 64)
+	if err != nil {
+		return err
+	}
+	price := pgconv.Int64ToNumeric(priceInt64 / 10)
 
 	asset, err := queries.CreateOrUpdateAsset(ctx, database.CreateOrUpdateAssetParams{
 		Code:      code,

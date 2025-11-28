@@ -20,3 +20,10 @@ returning *;
 select *
 from
     assets;
+
+-- name: GetAsset :one
+select *
+from
+    assets
+where
+    code = $1;
