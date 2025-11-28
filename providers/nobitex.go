@@ -41,6 +41,10 @@ func NobitexUpdateAsset(ctx context.Context, queries *database.Queries, code str
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("bad status code: %d", resp.StatusCode)
+	}
+
 	response := NobitexResponse{}
 	err = json.NewDecoder(resp.Body).Decode(&response)
 	if err != nil {

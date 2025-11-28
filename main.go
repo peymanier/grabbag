@@ -106,6 +106,7 @@ func main() {
 			select {
 			case <-ticker.C:
 				providers.NobitexUpdate(ctx, s.Queries)
+				providers.TGJUUpdateAssets(ctx, s.Queries)
 			case <-ctx.Done():
 				log.Println("stopping ticker")
 				return
