@@ -3,7 +3,7 @@
 create table assets
 (
     id         bigint generated always as identity primary key,
-    code       varchar(20)     not null unique,
+    code       varchar(20)    not null unique,
     price      numeric(15, 6) not null,
     created_at timestamptz    not null default now(),
     updated_at timestamptz    not null

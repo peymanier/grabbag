@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/peymanier/grabbag/database"
@@ -26,7 +27,7 @@ type NobitexResponse struct {
 }
 
 func NobitexUpdate(ctx context.Context, queries *database.Queries) {
-	codes := []string{"USDTIRT", "BTCUSDT", "ETHUSDT"}
+	codes := []string{"USDT/IRT", "BTC/USDT", "ETH/USDT"}
 	for _, code := range codes {
 		if err := NobitexUpdateAsset(ctx, queries, code); err != nil {
 			log.Println(err)
@@ -35,7 +36,8 @@ func NobitexUpdate(ctx context.Context, queries *database.Queries) {
 }
 
 func NobitexUpdateAsset(ctx context.Context, queries *database.Queries, code string) error {
-	resp, err := http.Get(fmt.Sprintf("https://apiv2.nobitex.ir/v2/trades/%s", code))
+	pair := strings.ReplaceAll(code, "/", "")
+	resp, err := http.Get(fmt.Sprintf("https://apiv2.nobitex.ir/v2/trades/%s", pair))
 	if err != nil {
 		return err
 	}
@@ -53,7 +55,7 @@ func NobitexUpdateAsset(ctx context.Context, queries *database.Queries, code str
 
 	price := pgconv.StringToNumeric(response.Trades[0].Price)
 
-	asset, err := queries.CreateOrUpdateAsset(context.Background(), database.CreateOrUpdateAssetParams{
+	asset, err := queries.CreateOrUpdateAsset(ctx, database.CreateOrUpdateAssetParams{
 		Code:      code,
 		Price:     price,
 		UpdatedAt: pgconv.TimeToTimestamptz(time.Now().UTC()),
@@ -62,7 +64,7 @@ func NobitexUpdateAsset(ctx context.Context, queries *database.Queries, code str
 		return err
 	}
 
-	_, err = queries.CreateAssetPriceLog(context.Background(), database.CreateAssetPriceLogParams{
+	_, err = queries.CreateAssetPriceLog(ctx, database.CreateAssetPriceLogParams{
 		AssetID: pgconv.Int64ToInt8(asset.ID),
 		Price:   price,
 	})
