@@ -11,6 +11,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/joho/godotenv"
 	"github.com/peymanier/grabbag/database"
@@ -84,11 +85,11 @@ func main() {
 	ctx := context.Background()
 	connStr := os.Getenv("POSTGRES_URL")
 
-	conn, err := pgx.Connect(ctx, connStr)
+	conn, err := pgxpool.New(ctx, connStr)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer conn.Close(ctx)
+	defer conn.Close()
 
 	err = RunMigrations(ctx, connStr, "./sql/schema")
 	if err != nil {
