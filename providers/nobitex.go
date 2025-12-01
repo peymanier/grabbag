@@ -54,11 +54,15 @@ func NobitexUpdateAsset(ctx context.Context, queries *database.Queries, code str
 		return err
 	}
 
-	priceInt64, err := strconv.ParseInt(response.Trades[0].Price, 10, 64)
+	nobitexPriceStr := response.Trades[0].Price
+	if code == "USDT/IRT" && strings.HasSuffix(nobitexPriceStr, "0") {
+		nobitexPriceStr = nobitexPriceStr[:len(nobitexPriceStr)-1]
+	}
+	priceFloat64, err := strconv.ParseFloat(nobitexPriceStr, 64)
 	if err != nil {
 		return err
 	}
-	price := pgconv.Int64ToNumeric(priceInt64 / 10)
+	price := pgconv.Float64ToNumeric(priceFloat64)
 
 	asset, err := queries.CreateOrUpdateAsset(ctx, database.CreateOrUpdateAssetParams{
 		Code:      code,
