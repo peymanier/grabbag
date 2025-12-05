@@ -49,27 +49,38 @@ with
                          where
                              created_at > now() - interval '7 days')
 
-select *,
-       (select
-            (price_changes_4h.last - price_changes_4h.first)::numeric
+select *
+from
+    assets
+        join lateral (
+        select
+            price_changes_4h.first::numeric                           as first4h,
+            (price_changes_4h.last - price_changes_4h.first)::numeric as change4h
         from
             price_changes_4h
         where
-            asset_id = assets.id) as change4h,
-       (select
-            (price_changes_1d.last - price_changes_1d.first)::numeric
+            asset_id = assets.id
+        ) as pch4h on true
+
+        join lateral (
+        select
+            price_changes_1d.first::numeric                           as first1d,
+            (price_changes_1d.last - price_changes_1d.first)::numeric as change1d
         from
             price_changes_1d
         where
-            asset_id = assets.id) as change1d,
-       (select
-            (price_changes_7d.last - price_changes_7d.first)::numeric
+            asset_id = assets.id
+        ) as pch1d on true
+
+        join lateral (
+        select
+            price_changes_7d.first::numeric                           as first7d,
+            (price_changes_7d.last - price_changes_7d.first)::numeric as change7d
         from
             price_changes_7d
         where
-            asset_id = assets.id) as change7d
-from
-    assets;
+            asset_id = assets.id
+        ) as pch7d on true;
 
 -- name: GetAsset :one
 select *

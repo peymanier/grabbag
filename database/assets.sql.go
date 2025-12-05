@@ -121,27 +121,38 @@ with
                          where
                              created_at > now() - interval '7 days')
 
-select id, code, price, created_at, updated_at,
-       (select
-            (price_changes_4h.last - price_changes_4h.first)::numeric
+select id, code, price, created_at, updated_at, first4h, change4h, first1d, change1d, first7d, change7d
+from
+    assets
+        join lateral (
+        select
+            price_changes_4h.first::numeric                           as first4h,
+            (price_changes_4h.last - price_changes_4h.first)::numeric as change4h
         from
             price_changes_4h
         where
-            asset_id = assets.id) as change4h,
-       (select
-            (price_changes_1d.last - price_changes_1d.first)::numeric
+            asset_id = assets.id
+        ) as pch4h on true
+
+        join lateral (
+        select
+            price_changes_1d.first::numeric                           as first1d,
+            (price_changes_1d.last - price_changes_1d.first)::numeric as change1d
         from
             price_changes_1d
         where
-            asset_id = assets.id) as change1d,
-       (select
-            (price_changes_7d.last - price_changes_7d.first)::numeric
+            asset_id = assets.id
+        ) as pch1d on true
+
+        join lateral (
+        select
+            price_changes_7d.first::numeric                           as first7d,
+            (price_changes_7d.last - price_changes_7d.first)::numeric as change7d
         from
             price_changes_7d
         where
-            asset_id = assets.id) as change7d
-from
-    assets
+            asset_id = assets.id
+        ) as pch7d on true
 `
 
 type ListAssetsWithPriceChangesRow struct {
@@ -150,8 +161,11 @@ type ListAssetsWithPriceChangesRow struct {
 	Price     pgtype.Numeric
 	CreatedAt pgtype.Timestamptz
 	UpdatedAt pgtype.Timestamptz
+	First4h   pgtype.Numeric
 	Change4h  pgtype.Numeric
+	First1d   pgtype.Numeric
 	Change1d  pgtype.Numeric
+	First7d   pgtype.Numeric
 	Change7d  pgtype.Numeric
 }
 
@@ -170,8 +184,11 @@ func (q *Queries) ListAssetsWithPriceChanges(ctx context.Context) ([]ListAssetsW
 			&i.Price,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.First4h,
 			&i.Change4h,
+			&i.First1d,
 			&i.Change1d,
+			&i.First7d,
 			&i.Change7d,
 		); err != nil {
 			return nil, err

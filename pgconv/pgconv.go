@@ -28,9 +28,9 @@ func NumericToString(n pgtype.Numeric) *string {
 	return &s
 }
 
-func NumericToFloat64(n pgtype.Numeric) float64 {
+func NumericToFloat64(n pgtype.Numeric) *float64 {
 	if !n.Valid {
-		panic(fmt.Errorf("invalid numeric"))
+		return nil
 	}
 
 	float8, err := n.Float64Value()
@@ -42,7 +42,7 @@ func NumericToFloat64(n pgtype.Numeric) float64 {
 		panic(fmt.Errorf("invalid numeric"))
 	}
 
-	return float8.Float64
+	return &float8.Float64
 }
 
 func Float64ToNumeric(f float64) pgtype.Numeric {

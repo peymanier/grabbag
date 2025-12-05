@@ -132,7 +132,7 @@ func CreateConvertedUSDTQuoteAsset(ctx context.Context, queries *database.Querie
 	baseAsset := strings.Split(asset.Code, "/")[0]
 	code := fmt.Sprintf("%s/USDT", baseAsset)
 
-	priceFloat64 := pgconv.NumericToFloat64(asset.Price) / pgconv.NumericToFloat64(USDTIRTPrice)
+	priceFloat64 := *pgconv.NumericToFloat64(asset.Price) / *pgconv.NumericToFloat64(USDTIRTPrice)
 	price := pgconv.Float64ToNumeric(priceFloat64)
 
 	asset, err := queries.CreateOrUpdateAsset(ctx, database.CreateOrUpdateAssetParams{
