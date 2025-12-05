@@ -10,7 +10,7 @@ import (
 )
 
 func (s *Server) ListAssets(w http.ResponseWriter, r *http.Request) {
-	assets, err := s.Queries.ListAssets(r.Context())
+	assets, err := s.Queries.ListAssetsWithPriceChanges(r.Context())
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, messages.ErrUnknown.String(), http.StatusInternalServerError)

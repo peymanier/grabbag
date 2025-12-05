@@ -7,6 +7,9 @@
         <div class="asset">
             <p><strong>Code:</strong> {{ .Code }}</p>
             <p><strong>Price:</strong> {{ .Price }}</p>
+            <p><strong>4h Change:</strong> {{ with .Change4h }}{{ . }}{{ else }}N/A{{ end }}</p>
+            <p><strong>1d Change:</strong> {{ with .Change1d }}{{ . }}{{ else }}N/A{{ end }}</p>
+            <p><strong>7d Change:</strong> {{ with .Change7d }}{{ . }}{{ else }}N/A{{ end }}</p>
             <p><strong>Updated At:</strong> {{ timeago .UpdatedAt }}</p>
         </div>
         <hr>

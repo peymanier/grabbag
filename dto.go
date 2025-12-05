@@ -13,9 +13,9 @@ type AssetsWithPriceChangesDTO struct {
 	Price     string
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	Change4H  string
-	Change1D  string
-	Change7D  string
+	Change4h  *string
+	Change1d  *string
+	Change7d  *string
 }
 
 func AssetToDTO(asset database.ListAssetsWithPriceChangesRow) AssetsWithPriceChangesDTO {
@@ -25,9 +25,9 @@ func AssetToDTO(asset database.ListAssetsWithPriceChangesRow) AssetsWithPriceCha
 		Price:     *pgconv.NumericToString(asset.Price),
 		CreatedAt: *pgconv.TimestamptzToTime(asset.CreatedAt),
 		UpdatedAt: *pgconv.TimestamptzToTime(asset.UpdatedAt),
-		Change4H:  *pgconv.NumericToString(asset.Change4h),
-		Change1D:  *pgconv.NumericToString(asset.Change1d),
-		Change7D:  *pgconv.NumericToString(asset.Change7d),
+		Change4h:  pgconv.NumericToString(asset.Change4h),
+		Change1d:  pgconv.NumericToString(asset.Change1d),
+		Change7d:  pgconv.NumericToString(asset.Change7d),
 	}
 }
 
