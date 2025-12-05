@@ -15,11 +15,11 @@ type AssetsWithPriceChangesDTO struct {
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
 	PercentChange4h *float64
-	Change4h        *string
+	Change4h        *float64
 	PercentChange1d *float64
-	Change1d        *string
+	Change1d        *float64
 	PercentChange7d *float64
-	Change7d        *string
+	Change7d        *float64
 }
 
 func calculateAssetPriceChange(firstPrice, priceChange pgtype.Numeric) *float64 {
@@ -51,11 +51,11 @@ func AssetToDTO(asset database.ListAssetsWithPriceChangesRow) AssetsWithPriceCha
 		CreatedAt:       *pgconv.TimestamptzToTime(asset.CreatedAt),
 		UpdatedAt:       *pgconv.TimestamptzToTime(asset.UpdatedAt),
 		PercentChange4h: percentChange4h,
-		Change4h:        pgconv.NumericToString(asset.Change4h),
+		Change4h:        pgconv.NumericToFloat64(asset.Change4h),
 		PercentChange1d: percentChange1d,
-		Change1d:        pgconv.NumericToString(asset.Change1d),
+		Change1d:        pgconv.NumericToFloat64(asset.Change1d),
 		PercentChange7d: percentChange7d,
-		Change7d:        pgconv.NumericToString(asset.Change7d),
+		Change7d:        pgconv.NumericToFloat64(asset.Change7d),
 	}
 }
 

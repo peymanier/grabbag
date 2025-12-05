@@ -9,21 +9,21 @@
             <p><strong>Price:</strong> {{ .Price }}</p>
             <p><strong>4h Change:</strong>
                 {{ with .Change4h }}
-                    {{ . }} - {{ with $asset.PercentChange4h }} {{ . }} {{ else }} N/A {{ end }}
+                    {{ formatfloat (dereffloat64 .) }} Percentage: {{ with $asset.PercentChange4h }} {{ printf "%.2f%%" (dereffloat64 .) }} {{ else }} N/A {{ end }}
                 {{ else }}
                     N/A
                 {{ end }}
             </p>
             <p><strong>1d Change:</strong>
                 {{ with .Change1d }}
-                    {{ . }} - {{ with $asset.PercentChange1d }} {{ . }} {{ else }} N/A {{ end }}
+                    {{ formatfloat (dereffloat64 .) }} Percentage: {{ with $asset.PercentChange1d }} {{ printf "%.2f%%" (dereffloat64 .) }} {{ else }} N/A {{ end }}
                 {{ else }}
                     N/A
                 {{ end }}
             </p>
             <p><strong>7d Change:</strong>
                 {{ with .Change7d }}
-                    {{ . }} - {{ with $asset.PercentChange7d }} {{ . }} {{ else }} N/A {{ end }}
+                    {{ formatfloat (dereffloat64 .) }} Percentage: {{ with $asset.PercentChange7d }} {{ printf "%.2f%%" (dereffloat64 .) }} {{ else }} N/A {{ end }}
                 {{ else }}
                     N/A
                 {{ end }}

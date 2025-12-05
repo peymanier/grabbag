@@ -3,6 +3,8 @@ package templ
 import (
 	"fmt"
 	"time"
+
+	"github.com/dustin/go-humanize"
 )
 
 func TimeAgo(t time.Time) string {
@@ -24,4 +26,16 @@ func TimeAgo(t time.Time) string {
 		return fmt.Sprintf("%d month(s) ago", int(d.Hours()/(24*30)))
 	}
 	return fmt.Sprintf("%d year(s) ago", int(d.Hours()/(24*365)))
+}
+
+func DerefFloat64(f *float64) float64 {
+	if f == nil {
+		return 0
+	}
+	return *f
+}
+
+func FormatFloat(f float64) string {
+	//return strconv.FormatFloat(f, 'f', -1, 64)
+	return humanize.FormatFloat("", f)
 }

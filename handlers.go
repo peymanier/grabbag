@@ -18,7 +18,9 @@ func (s *Server) ListAssets(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tmpl := template.Must(template.New("").Funcs(template.FuncMap{
-		"timeago": templ.TimeAgo,
+		"timeago":      templ.TimeAgo,
+		"dereffloat64": templ.DerefFloat64,
+		"formatfloat":  templ.FormatFloat,
 	}).ParseFiles("templates/layout.gohtml", "templates/assets.gohtml"))
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
