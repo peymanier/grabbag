@@ -88,27 +88,91 @@ func (q *Queries) GetAsset(ctx context.Context, code string) (Asset, error) {
 	return i, err
 }
 
-const listAssets = `-- name: ListAssets :many
-select id, code, price, created_at, updated_at
+const listAssetsWithPriceChanges = `-- name: ListAssetsWithPriceChanges :many
+with
+    price_changes_4h as (select distinct on (asset_id)
+                             asset_id,
+                             first_value(price)
+                             over (partition by asset_id order by created_at range between unbounded preceding and unbounded following) as first,
+                             last_value(price)
+                             over (partition by asset_id order by created_at range between unbounded preceding and unbounded following) as last
+                         from
+                             asset_price_logs
+                         where
+                             created_at > now() - interval '4 hours'),
+    price_changes_1d as (select distinct on (asset_id)
+                             asset_id,
+                             first_value(price)
+                             over (partition by asset_id order by created_at range between unbounded preceding and unbounded following) as first,
+                             last_value(price)
+                             over (partition by asset_id order by created_at range between unbounded preceding and unbounded following) as last
+                         from
+                             asset_price_logs
+                         where
+                             created_at > now() - interval '1 day'),
+    price_changes_7d as (select distinct on (asset_id)
+                             asset_id,
+                             first_value(price)
+                             over (partition by asset_id order by created_at range between unbounded preceding and unbounded following) as first,
+                             last_value(price)
+                             over (partition by asset_id order by created_at range between unbounded preceding and unbounded following) as last
+                         from
+                             asset_price_logs
+                         where
+                             created_at > now() - interval '7 days')
+
+select id, code, price, created_at, updated_at,
+       (select
+            (price_changes_4h.last - price_changes_4h.first)::numeric
+        from
+            price_changes_4h
+        where
+            asset_id = assets.id) as change4h,
+       (select
+            (price_changes_1d.last - price_changes_1d.first)::numeric
+        from
+            price_changes_1d
+        where
+            asset_id = assets.id) as change1d,
+       (select
+            (price_changes_7d.last - price_changes_7d.first)::numeric
+        from
+            price_changes_7d
+        where
+            asset_id = assets.id) as change7d
 from
     assets
 `
 
-func (q *Queries) ListAssets(ctx context.Context) ([]Asset, error) {
-	rows, err := q.db.Query(ctx, listAssets)
+type ListAssetsWithPriceChangesRow struct {
+	ID        int64
+	Code      string
+	Price     pgtype.Numeric
+	CreatedAt pgtype.Timestamptz
+	UpdatedAt pgtype.Timestamptz
+	Change4h  pgtype.Numeric
+	Change1d  pgtype.Numeric
+	Change7d  pgtype.Numeric
+}
+
+func (q *Queries) ListAssetsWithPriceChanges(ctx context.Context) ([]ListAssetsWithPriceChangesRow, error) {
+	rows, err := q.db.Query(ctx, listAssetsWithPriceChanges)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Asset
+	var items []ListAssetsWithPriceChangesRow
 	for rows.Next() {
-		var i Asset
+		var i ListAssetsWithPriceChangesRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Code,
 			&i.Price,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.Change4h,
+			&i.Change1d,
+			&i.Change7d,
 		); err != nil {
 			return nil, err
 		}
