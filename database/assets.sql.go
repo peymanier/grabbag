@@ -124,7 +124,7 @@ with
 select id, code, price, created_at, updated_at, first4h, change4h, first1d, change1d, first7d, change7d
 from
     assets
-        join lateral (
+        left join lateral (
         select
             price_changes_4h.first::numeric                           as first4h,
             (price_changes_4h.last - price_changes_4h.first)::numeric as change4h
@@ -134,7 +134,7 @@ from
             asset_id = assets.id
         ) as pch4h on true
 
-        join lateral (
+        left join lateral (
         select
             price_changes_1d.first::numeric                           as first1d,
             (price_changes_1d.last - price_changes_1d.first)::numeric as change1d
@@ -144,7 +144,7 @@ from
             asset_id = assets.id
         ) as pch1d on true
 
-        join lateral (
+        left join lateral (
         select
             price_changes_7d.first::numeric                           as first7d,
             (price_changes_7d.last - price_changes_7d.first)::numeric as change7d
