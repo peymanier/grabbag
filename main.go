@@ -37,6 +37,9 @@ func (s *Server) MountHandlers() {
 	s.Router.Use(middleware.Heartbeat("/ping"))
 
 	s.Router.Get("/assets", s.ListAssets)
+
+	fs := http.FileServer(http.Dir("static"))
+	s.Router.Handle("/static/*", http.StripPrefix("/static/", fs))
 }
 
 func RunMigrations(ctx context.Context, connStr, migrationsDir string) error {

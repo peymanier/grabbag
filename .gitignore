@@ -29,3 +29,6 @@ go.work.sum
 
 # binary
 rssagg
+
+# JS
+node_modules
