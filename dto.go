@@ -34,7 +34,7 @@ func calculateAssetPriceChange(firstPrice, priceChange pgtype.Numeric) *float64 
 		return nil
 	}
 
-	res := *change / *first
+	res := (*change / *first) * 100
 	return &res
 
 }
