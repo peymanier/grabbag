@@ -1,37 +1,77 @@
 {{ define "title" }}Assets - Grabbag{{ end }}
 
 {{ define "content" }}
-    <h1>Assets</h1>
+    <div class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {{ range $asset := . }}
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow duration-200">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ .Code }}</h2>
+                            <p class="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">{{ .Price }}</p>
+                        </div>
+                    </div>
 
-    {{ range $asset := . }}
-        <div class="asset">
-            <p><strong>Code:</strong> {{ .Code }}</p>
-            <p><strong>Price:</strong> {{ .Price }}</p>
-            <p><strong>4h Change:</strong>
-                {{ with .Change4h }}
-                    {{ formatfloat (dereffloat64 .) }} Percentage: {{ with $asset.PercentChange4h }} {{ printf "%.2f%%" (dereffloat64 .) }} {{ else }} N/A {{ end }}
-                {{ else }}
-                    N/A
-                {{ end }}
-            </p>
-            <p><strong>1d Change:</strong>
-                {{ with .Change1d }}
-                    {{ formatfloat (dereffloat64 .) }} Percentage: {{ with $asset.PercentChange1d }} {{ printf "%.2f%%" (dereffloat64 .) }} {{ else }} N/A {{ end }}
-                {{ else }}
-                    N/A
-                {{ end }}
-            </p>
-            <p><strong>7d Change:</strong>
-                {{ with .Change7d }}
-                    {{ formatfloat (dereffloat64 .) }} Percentage: {{ with $asset.PercentChange7d }} {{ printf "%.2f%%" (dereffloat64 .) }} {{ else }} N/A {{ end }}
-                {{ else }}
-                    N/A
-                {{ end }}
-            </p>
-            <p><strong>Updated At:</strong> {{ timeago .UpdatedAt }}</p>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between items-center py-1 border-b border-gray-100 dark:border-gray-700 last:border-0">
+                            <span class="text-gray-600 dark:text-gray-400">4h Change</span>
+                            <span class="font-medium text-gray-900 dark:text-gray-200">
+                                {{ with .Change4h }}
+                                    {{ formatfloat (dereffloat64 .) }}
+                                    {{ with $asset.PercentChange4h }}
+                                        <span class="ml-1 {{ if gt (dereffloat64 .) 0.0 }}text-green-600 dark:text-green-400{{ else if lt (dereffloat64 .) 0.0 }}text-red-600 dark:text-red-400{{ end }}">
+                                            ({{ printf "%.2f%%" (dereffloat64 .) }})
+                                        </span>
+                                    {{ end }}
+                                {{ else }}
+                                    <span class="text-gray-400">N/A</span>
+                                {{ end }}
+                            </span>
+                        </div>
+
+                        <div class="flex justify-between items-center py-1 border-b border-gray-100 dark:border-gray-700 last:border-0">
+                            <span class="text-gray-600 dark:text-gray-400">1d Change</span>
+                            <span class="font-medium text-gray-900 dark:text-gray-200">
+                                {{ with .Change1d }}
+                                    {{ formatfloat (dereffloat64 .) }}
+                                    {{ with $asset.PercentChange1d }}
+                                        <span class="ml-1 {{ if gt (dereffloat64 .) 0.0 }}text-green-600 dark:text-green-400{{ else if lt (dereffloat64 .) 0.0 }}text-red-600 dark:text-red-400{{ end }}">
+                                            ({{ printf "%.2f%%" (dereffloat64 .) }})
+                                        </span>
+                                    {{ end }}
+                                {{ else }}
+                                    <span class="text-gray-400">N/A</span>
+                                {{ end }}
+                            </span>
+                        </div>
+
+                        <div class="flex justify-between items-center py-1 border-b border-gray-100 dark:border-gray-700 last:border-0">
+                            <span class="text-gray-600 dark:text-gray-400">7d Change</span>
+                            <span class="font-medium text-gray-900 dark:text-gray-200">
+                                {{ with .Change7d }}
+                                    {{ formatfloat (dereffloat64 .) }}
+                                    {{ with $asset.PercentChange7d }}
+                                        <span class="ml-1 {{ if gt (dereffloat64 .) 0.0 }}text-green-600 dark:text-green-400{{ else if lt (dereffloat64 .) 0.0 }}text-red-600 dark:text-red-400{{ end }}">
+                                            ({{ printf "%.2f%%" (dereffloat64 .) }})
+                                        </span>
+                                    {{ end }}
+                                {{ else }}
+                                    <span class="text-gray-400">N/A</span>
+                                {{ end }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400 flex items-center justify-between">
+                        <span>Updated</span>
+                        <span>{{ timeago .UpdatedAt }}</span>
+                    </div>
+                </div>
+            {{ else }}
+                <div class="col-span-full text-center py-12 text-gray-500 dark:text-gray-400">
+                    <p class="text-lg">No assets found.</p>
+                </div>
+            {{ end }}
         </div>
-        <hr>
-    {{ else }}
-        <p>No assets found.</p>
-    {{ end }}
+    </div>
 {{ end }}
