@@ -11,7 +11,7 @@ import (
 type AssetsWithPriceChangesDTO struct {
 	ID              int64
 	Code            string
-	Price           string
+	Price           float64
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
 	PercentChange4h *float64
@@ -47,7 +47,7 @@ func AssetToDTO(asset database.ListAssetsWithPriceChangesRow) AssetsWithPriceCha
 	return AssetsWithPriceChangesDTO{
 		ID:              asset.ID,
 		Code:            asset.Code,
-		Price:           *pgconv.NumericToString(asset.Price),
+		Price:           *pgconv.NumericToFloat64(asset.Price),
 		CreatedAt:       *pgconv.TimestamptzToTime(asset.CreatedAt),
 		UpdatedAt:       *pgconv.TimestamptzToTime(asset.UpdatedAt),
 		PercentChange4h: percentChange4h,
