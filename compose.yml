@@ -1,0 +1,49 @@
+services:
+  server:
+    container_name: grabbag-server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: grabbag-server:latest
+    ports:
+      - "3333:3333"
+    networks:
+      - grabbag-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3333/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      postgres:
+        condition: service_healthy
+    develop:
+      watch:
+        - path: .
+          action: rebuild
+
+  postgres:
+    image: postgres:18.1-alpine3.23
+    restart: unless-stopped
+    container_name: stock-postgres
+    environment:
+      - "POSTGRES_DB=${POSTGRES_DB}"
+      - "POSTGRES_USER=${POSTGRES_USER}"
+      - "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
+    volumes:
+      - "pg-data:/var/lib/postgresql/data"
+    networks:
+      - grabbag-network
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 3s
+
+volumes:
+  pg-data:
+
+networks:
+  grabbag-network:
+    driver: bridge

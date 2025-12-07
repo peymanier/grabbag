@@ -31,7 +31,7 @@ func TestMain(m *testing.M) {
 	dbPassword := "password"
 
 	postgresContainer, err := postgres.Run(ctx,
-		"postgres:17-alpine",
+		"postgres:18.1-alpine3.23",
 		postgres.WithDatabase(dbName),
 		postgres.WithUsername(dbUser),
 		postgres.WithPassword(dbPassword),
