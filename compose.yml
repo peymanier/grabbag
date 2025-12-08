@@ -17,6 +17,11 @@ services:
       context: .
       dockerfile: Dockerfile
     image: grabbag-server:latest
+    labels:
+      - "traefik.http.routers.guestbook.rule=Host(`peymanier.com`)"
+    deploy:
+      mode: replicated
+      replicas: 3
     ports:
       - "3333:3333"
     networks:
