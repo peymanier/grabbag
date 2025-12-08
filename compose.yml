@@ -18,8 +18,8 @@ services:
       - letsencrypt:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock
 
-  grabbag:
-    container_name: grabbag
+  grabbag-server:
+    container_name: grabbag-server
     build:
       context: .
       dockerfile: Dockerfile
