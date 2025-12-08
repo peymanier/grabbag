@@ -18,17 +18,17 @@ services:
       - letsencrypt:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock
 
-  server:
-    container_name: grabbag-server
+  grabbag:
+    container_name: grabbag
     build:
       context: .
       dockerfile: Dockerfile
     image: grabbag-server:latest
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.guestbook.rule=Host(`peymanier.com`)"
-      - "traefik.http.routers.guestbook.entrypoints=websecure"
-      - "traefik.http.routers.guestbook.tls.certresolver=myresolver"
+      - "traefik.http.routers.grabbag.rule=Host(`peymanier.com`)"
+      - "traefik.http.routers.grabbag.entrypoints=websecure"
+      - "traefik.http.routers.grabbag.tls.certresolver=myresolver"
     deploy:
       mode: replicated
       replicas: 3
