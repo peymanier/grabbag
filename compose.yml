@@ -1,52 +1,38 @@
 services:
   traefik:
     image: traefik:v3.6
+    restart: unless-stopped
     command:
-      - "--providers.docker"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entryPoints.websecure.address=:443"
-      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=hassani.peyman627@gmail.com"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
       - "--entrypoints.web.address=:80"
-      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
     ports:
       - "80:80"
-      - "443:443"
+      - "8080:8080"
     volumes:
-      - letsencrypt:/letsencrypt
-      - /var/run/docker.sock:/var/run/docker.sock
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
   grabbag-server:
     build:
       context: .
       dockerfile: Dockerfile
     image: grabbag-server:prod
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.grabbag.rule=Host(`peymanier.com`)"
-      - "traefik.http.routers.grabbag.entrypoints=websecure"
-      - "traefik.http.routers.grabbag.tls.certresolver=myresolver"
+    container_name: grabbag-server
+    restart: unless-stopped
     networks:
       - grabbag-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3333/ping"]
+      test: [ "CMD", "curl", "-f", "http://localhost:3333/ping" ]
       interval: 30s
       timeout: 10s
       retries: 5
     depends_on:
       postgres:
         condition: service_healthy
-    develop:
-      watch:
-        - path: .
-          action: rebuild
 
   postgres:
     image: postgres:18.1-alpine3.23
     restart: unless-stopped
-    container_name: grabbag-postgres
     environment:
       - "POSTGRES_DB=${POSTGRES_DB}"
       - "POSTGRES_USER=${POSTGRES_USER}"
@@ -68,7 +54,6 @@ services:
 
 volumes:
   pg-data:
-  letsencrypt:
 
 networks:
   grabbag-network:
