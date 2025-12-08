@@ -37,7 +37,7 @@ services:
   postgres:
     image: postgres:18.1-alpine3.23
     restart: unless-stopped
-    container_name: stock-postgres
+    container_name: grabbag-postgres
     environment:
       - "POSTGRES_DB=${POSTGRES_DB}"
       - "POSTGRES_USER=${POSTGRES_USER}"
