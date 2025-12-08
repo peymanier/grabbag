@@ -23,7 +23,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: grabbag-server:latest
+    image: grabbag-server:prod
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.grabbag.rule=Host(`peymanier.com`)"
