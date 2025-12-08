@@ -19,7 +19,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   grabbag-server:
-    container_name: grabbag-server
     build:
       context: .
       dockerfile: Dockerfile
@@ -29,13 +28,10 @@ services:
       - "traefik.http.routers.grabbag.rule=Host(`peymanier.com`)"
       - "traefik.http.routers.grabbag.entrypoints=websecure"
       - "traefik.http.routers.grabbag.tls.certresolver=myresolver"
-    deploy:
-      mode: replicated
-      replicas: 3
     networks:
       - grabbag-network
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:3333/ping" ]
+      test: ["CMD", "curl", "-f", "http://localhost:3333/ping"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -60,7 +56,11 @@ services:
     networks:
       - grabbag-network
     healthcheck:
-      test: [ "CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'" ]
+      test:
+        [
+          "CMD-SHELL",
+          "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'",
+        ]
       interval: 10s
       timeout: 10s
       retries: 5
