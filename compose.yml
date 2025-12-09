@@ -2,25 +2,51 @@ services:
   traefik:
     image: traefik:v3.6
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - proxy
     command:
-      - "--api.insecure=true"
+      - "--api.insecure=false"
+      - "--api.dashboard=true"
+      - "--log.level=INFO"
+      - "--accesslog=true"
       - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=proxy"
+      - "--providers.file.directory=/etc/traefik/dynamic"
       - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.websecure.http.tls=true"
+      - "--certificatesresolvers.le.acme.email=hassani.peyman627@gmail.com"
+      - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.le.acme.httpchallenge.entrypoint=web"
     ports:
       - "80:80"
+      - "443:443"
       - "8080:8080"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./certs:/certs:ro"
+      - "./dynamic:/etc/traefik/dynamic:ro"
+      - "./letsencrypt:/letsencrypt"
 
-  grabbag-server:
+  server:
     build:
       context: .
       dockerfile: Dockerfile
-    image: grabbag-server:prod
-    container_name: grabbag-server
     restart: unless-stopped
     networks:
-      - grabbag-network
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.server.rule=Host(`peymanier.com`)"
+      - "traefik.http.routers.server.entrypoints=web"
+      - "traefik.http.routers.server.tls=true"
+      - "traefik.http.routers.server.tls.certresolver=le"
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:3333/ping" ]
       interval: 30s
@@ -40,7 +66,7 @@ services:
     volumes:
       - "pg-data:/var/lib/postgresql/data"
     networks:
-      - grabbag-network
+      - proxy
     healthcheck:
       test:
         [
@@ -56,5 +82,5 @@ volumes:
   pg-data:
 
 networks:
-  grabbag-network:
-    driver: bridge
+  proxy:
+    name: proxy
