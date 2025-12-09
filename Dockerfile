@@ -18,10 +18,11 @@ FROM alpine:3.21 AS final
 
 RUN --mount=type=cache,target=/var/cache/apk \
     apk --update add \
-        ca-certificates \
-        tzdata \
-        && \
-        update-ca-certificates
+    ca-certificates \
+    tzdata \
+    curl \
+    && \
+    update-ca-certificates
 
 ARG UID=10001
 RUN adduser \
