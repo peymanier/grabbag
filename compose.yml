@@ -30,9 +30,7 @@ services:
       - "8080:8080"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./certs:/certs:ro"
-      - "./dynamic:/etc/traefik/dynamic:ro"
-      - "./letsencrypt:/letsencrypt"
+      - "letsencrypt:/letsencrypt"
 
   server:
     build:
@@ -80,6 +78,7 @@ services:
 
 volumes:
   pg-data:
+  letsencrypt:
 
 networks:
   proxy:
