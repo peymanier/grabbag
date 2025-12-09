@@ -41,7 +41,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.server.rule=Host(`peymanier.com`)"
-      - "traefik.http.routers.server.entrypoints=web"
+      - "traefik.http.routers.server.entrypoints=websecure"
       - "traefik.http.routers.server.tls=true"
       - "traefik.http.routers.server.tls.certresolver=le"
     healthcheck:
