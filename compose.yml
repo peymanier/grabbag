@@ -45,7 +45,6 @@ services:
       - "traefik.http.routers.server.entrypoints=websecure"
       - "traefik.http.routers.server.tls=true"
       - "traefik.http.routers.server.tls.certresolver=le"
-      - "traefik.http.services.server.loadbalancer.server.port=3333"
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:3333/ping" ]
       interval: 30s
