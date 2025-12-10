@@ -51,6 +51,9 @@ services:
       timeout: 10s
       retries: 5
       start_period: 10s
+    deploy:
+      mode: replicated
+      replicas: 3
     depends_on:
       postgres:
         condition: service_healthy
