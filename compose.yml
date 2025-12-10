@@ -1,4 +1,13 @@
 services:
+  watchtower:
+    image: containrrr/watchtower
+    command:
+      - "--label-enable"
+      - "--interval"
+      - "30"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
   traefik:
     image: traefik:v3.6
     restart: unless-stopped
@@ -36,6 +45,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: peyman627/grabbag:prod
     restart: unless-stopped
     networks:
       - proxy
@@ -45,6 +55,7 @@ services:
       - "traefik.http.routers.server.entrypoints=websecure"
       - "traefik.http.routers.server.tls=true"
       - "traefik.http.routers.server.tls.certresolver=le"
+      - "com.centurylinklabs.watchtower.enable=true"
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:3333/ping" ]
       interval: 30s
