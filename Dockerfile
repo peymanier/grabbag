@@ -6,13 +6,14 @@ ENV CGO_ENABLED=0 \
 
 WORKDIR /src
 
-COPY go.mod go.sum ./
+RUN --mount=type=cache,target=/go/pkg/mod/ \
+    --mount=type=bind,source=go.sum,target=go.sum \
+    --mount=type=bind,source=go.mod,target=go.mod \
+    go mod download -x
 
-RUN go mod download
-
-COPY . .
-
-RUN go build -o /bin/app .
+RUN --mount=type=cache,target=/go/pkg/mod/ \
+    --mount=type=bind,target=. \
+    go build -o /bin/app .
 
 FROM alpine:3.21 AS final
 
