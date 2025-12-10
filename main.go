@@ -103,7 +103,7 @@ func main() {
 	s.MountHandlers()
 
 	ctx, cancel := context.WithCancel(context.Background())
-	ticker := time.NewTicker(10 * time.Second)
+	ticker := time.NewTicker(1 * time.Minute)
 
 	go func() {
 		for {
