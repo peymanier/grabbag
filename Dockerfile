@@ -11,9 +11,10 @@ RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=bind,source=go.mod,target=go.mod \
     go mod download -x \
 
+COPY . .
+
 RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=cache,target=/root/.cache/go-build \
-    --mount=type=bind,target=. \
     go build -o /bin/app .
 
 FROM alpine:3.21 AS final
