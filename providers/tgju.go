@@ -70,7 +70,11 @@ func TGJUUpdateCoins(ctx context.Context, queries *database.Queries) error {
 
 	for _, coin := range response.Coins {
 		code := GetCoinCode(coin)
-		price := GetCoinPrice(coin)
+		price, err := GetCoinPrice(coin)
+		if err != nil {
+			log.Println(err)
+			continue
+		}
 
 		asset, err := queries.CreateOrUpdateAsset(ctx, database.CreateOrUpdateAssetParams{
 			Code:      code,
@@ -116,16 +120,16 @@ func GetCoinCode(coin TGJUCoin) string {
 	return code
 }
 
-func GetCoinPrice(coin TGJUCoin) pgtype.Numeric {
+func GetCoinPrice(coin TGJUCoin) (pgtype.Numeric, error) {
 	priceStr := strings.ReplaceAll(coin.Price, ",", "")
 
 	priceInt64, err := strconv.ParseInt(priceStr, 10, 64)
 	if err != nil {
-		log.Println(err)
+		return pgtype.Numeric{}, err
 	}
 
 	price := pgconv.Int64ToNumeric(priceInt64 / 10)
-	return price
+	return price, nil
 }
 
 func CreateConvertedUSDTQuoteAsset(ctx context.Context, queries *database.Queries, asset database.Asset, USDTIRTPrice pgtype.Numeric) database.Asset {
