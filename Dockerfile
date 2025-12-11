@@ -38,6 +38,8 @@ RUN adduser \
     appuser
 USER appuser
 
+WORKDIR /app
+
 COPY --from=builder /bin/app /bin/app
 COPY ./sql ./sql
 COPY ./templates ./templates
