@@ -57,8 +57,7 @@ services:
       mode: replicated
       replicas: 3
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
 
   postgres:
     image: postgres:18.1-alpine3.23
