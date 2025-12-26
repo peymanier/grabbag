@@ -18,7 +18,7 @@ jobs:
         with:
           registry: https://ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GH_PAT }}
 
       - name: Create .env file
         run: |
