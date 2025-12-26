@@ -44,7 +44,6 @@ COPY --from=builder /bin/app /bin/app
 COPY ./sql ./sql
 COPY ./templates ./templates
 COPY ./static ./static
-COPY ./.env ./.env
 
 EXPOSE 3333
 
