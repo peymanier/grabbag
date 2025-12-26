@@ -13,6 +13,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: Log in to the container registry
         uses: docker/login-action@v3
         with:
@@ -52,5 +53,7 @@ jobs:
           file: docker-stack.yaml
           host: peymanier.com
           user: peymanier
+          port: 3031
           ssh_key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+          mode: swarm
           env_file: './.env'

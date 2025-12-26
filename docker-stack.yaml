@@ -1,11 +1,6 @@
 services:
   traefik:
     image: traefik:v3.6
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    networks:
-      - proxy
     command:
       - "--api.insecure=false"
       - "--api.dashboard=false"
@@ -13,7 +8,6 @@ services:
       - "--accesslog=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      - "--providers.docker.network=proxy"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
@@ -35,10 +29,7 @@ services:
       - "./letsencrypt:/letsencrypt"
 
   server:
-    image: ghcr.io/peymanier/grabbag:${GIT_COMMIT_HASH:-latest}
-    restart: unless-stopped
-    networks:
-      - proxy
+    image: ghcr.io/peymanier/grabbag:latest
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.server.rule=Host(`peymanier.com`)"
@@ -61,15 +52,12 @@ services:
 
   postgres:
     image: postgres:18.1-alpine3.23
-    restart: unless-stopped
     environment:
       - "POSTGRES_DB=${POSTGRES_DB}"
       - "POSTGRES_USER=${POSTGRES_USER}"
       - "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
     volumes:
       - "pg-data:/var/lib/postgresql/data"
-    networks:
-      - proxy
     labels:
       - "traefik.enable=true"
       - "traefik.tcp.routers.postgres.rule=HostSNI(`*`)"
@@ -89,7 +77,3 @@ services:
 
 volumes:
   pg-data:
-
-networks:
-  proxy:
-    name: proxy
