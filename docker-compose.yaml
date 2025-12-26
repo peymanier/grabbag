@@ -47,6 +47,8 @@ services:
       - "traefik.http.routers.server.entrypoints=websecure"
       - "traefik.http.routers.server.tls=true"
       - "traefik.http.routers.server.tls.certresolver=le"
+    volumes:
+      - "./.env:/app/.env:ro"
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:3333/ping" ]
       interval: 30s
