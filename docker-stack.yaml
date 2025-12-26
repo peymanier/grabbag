@@ -29,7 +29,7 @@ services:
       - "./letsencrypt:/letsencrypt"
 
   server:
-    image: ghcr.io/peymanier/grabbag:latest
+    image: ghcr.io/peymanier/grabbag:${GIT_COMMIT_HASH:-latest}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.server.rule=Host(`peymanier.com`)"
