@@ -8,6 +8,7 @@ services:
       - "--accesslog=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=grabbag-net"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
@@ -24,6 +25,8 @@ services:
       - "443:443"
       - "8080:8080"
       - "5432:5432"
+    networks:
+      - grabbag-net
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./letsencrypt:/letsencrypt"
@@ -36,6 +39,8 @@ services:
       - "traefik.http.routers.server.entrypoints=websecure"
       - "traefik.http.routers.server.tls=true"
       - "traefik.http.routers.server.tls.certresolver=le"
+    networks:
+      - grabbag-net
     volumes:
       - "./.env:/app/.env:ro"
     healthcheck:
@@ -58,6 +63,8 @@ services:
       - "POSTGRES_DB=${POSTGRES_DB}"
       - "POSTGRES_USER=${POSTGRES_USER}"
       - "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
+    networks:
+      - grabbag-net
     volumes:
       - "pg-data:/var/lib/postgresql/data"
     labels:
@@ -79,3 +86,7 @@ services:
 
 volumes:
   pg-data:
+
+networks:
+  grabbag-net:
+    driver: overlay
