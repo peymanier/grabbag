@@ -35,10 +35,7 @@ services:
       - "./letsencrypt:/letsencrypt"
 
   server:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: peyman627/grabbag:prod
+    image: ghcr.io/peymanier/grabbag:${GIT_COMMIT_HASH:-latest}
     restart: unless-stopped
     networks:
       - proxy
@@ -55,6 +52,8 @@ services:
       retries: 5
       start_period: 10s
     deploy:
+      update_config:
+        order: start-first
       mode: replicated
       replicas: 3
     depends_on:
